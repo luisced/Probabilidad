@@ -39,3 +39,11 @@ else:
 
 # Close the connection
 conn.close()
+
+
+def load_data(db_path):
+    conn = sqlite3.connect(db_path)
+    query = "SELECT * FROM library_loans"
+    df = pd.read_sql(query, conn)
+    conn.close()
+    return df
