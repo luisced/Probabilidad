@@ -4,6 +4,22 @@ import matplotlib.pyplot as plt
 from connection import load_data
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
+st.title("Optimización de Inventario de Libros")
+
+# Descripción de la funcionalidad
+st.markdown("""
+## Descripción del Proyecto
+
+**Objetivo:** Optimizar el inventario de los libros más demandados en la biblioteca.
+
+**Metodología:**
+- Filtrado y agrupación de datos por título y mes.
+- Modelado de series temporales utilizando **Exponential Smoothing**.
+- Cálculo del **stock de seguridad** y **punto de reorden**.
+
+**Resultados:** Visualización de los puntos de reorden y cantidades de pedido para los 10 libros más demandados.
+""")
+
 df = load_data('./database.db')
 
 
@@ -65,7 +81,7 @@ inventory_df = pd.DataFrame({
     'Safety Stock': safety_stocks
 })
 
-st.subheader("Inventory Optimization for Top 10 Most Demanded Books")
+st.subheader("Optimización de Inventario para los 10 libros más demandados")
 fig, ax1 = plt.subplots(figsize=(14, 8))
 ax1.bar(inventory_df['Book Title'], inventory_df['Reorder Point'],
         color='b', alpha=0.7, label='Reorder Point')

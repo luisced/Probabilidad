@@ -1,5 +1,6 @@
 import pandas as pd
 import sqlite3
+import streamlit as st
 
 # Load the Excel file
 excel_file = './data.xlsx'
@@ -41,6 +42,7 @@ else:
 conn.close()
 
 
+@st.cache_data
 def load_data(db_path):
     conn = sqlite3.connect(db_path)
     query = "SELECT * FROM library_loans"
