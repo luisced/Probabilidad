@@ -14,10 +14,16 @@ df['Loan Date'] = pd.to_datetime(df['Loan Date'], errors='coerce')
 df['Loan Time'] = pd.to_datetime(
     df['Loan Time'], format='%H:%M:%S', errors='coerce').dt.time
 
-# Handle missing values (e.g., filling with 'Unknown' or removing rows)
-# For this example, we'll fill missing 'Library Name' and 'Title' with 'Unknown'
-df['Library Name'] = df['Library Name'].fillna('Unknown')
-df['Title'] = df['Title'].fillna('Unknown')
+# Display the cleaned dataframe to verify
+print("Cleaned DataFrame:")
+print(df.head())
+
+# Check for any remaining NaN values in critical columns
+print("\nNaN values in 'Loan Date':")
+print(df['Loan Date'].isna().sum())
+
+print("\nNaN values in 'Loan Time':")
+print(df['Loan Time'].isna().sum())
 
 # Connect to SQLite database (or create it)
 conn = sqlite3.connect('database.db')
