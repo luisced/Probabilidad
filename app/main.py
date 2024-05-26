@@ -6,20 +6,7 @@ import seaborn as sns
 from connection import load_data
 
 
-# Preprocess data function
-def preprocess_data(df):
-    df['Loan Date'] = pd.to_datetime(df['Loan Date'], errors='coerce')
-    df['Loan Time'] = pd.to_datetime(
-        df['Loan Time'], format='%H:%M:%S', errors='coerce').dt.time
-    df['Loan Time Seconds'] = df['Loan Time'].apply(
-        lambda t: t.hour * 3600 + t.minute * 60 + t.second if pd.notnull(t) else None)
-    if df.isnull().any().any():
-        st.sidebar.write(
-            "There are invalid or missing values in the DataFrame. These rows will be dropped.")
-        df = df.dropna()
-    df['Loan Date'] = df['Loan Date'].dt.date
-    df['Loan Date'] = pd.to_datetime(df['Loan Date'])
-    return df
+
 
 
 def main():
@@ -56,8 +43,6 @@ def main():
     - **Loan Time:** Hora en que se realizó el préstamo.
     """)
 
-    # # Preprocess data
-    # loan_counts = preprocess_data(df)
 
 
 if __name__ == "__main__":

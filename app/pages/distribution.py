@@ -1,14 +1,17 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import streamlit as st
 from connection import load_data
 import plotly.figure_factory as ff
+import plotly.express as px
+import pandas as pd
+
+
+df = load_data('./database.db')
 
 
 @st.cache_data
-def plot_poisson_distribution():
+def plot_poisson_distribution(df=df):
     # Distribución de Préstamos por Día
-    df = load_data('./database.db')
 
     loan_counts = df['Loan Date'].value_counts()
     mean_loans_per_day = loan_counts.mean()
@@ -36,18 +39,15 @@ def plot_poisson_distribution():
 # Llamar a la función para mostrar la distribución
 plot_poisson_distribution()
 
-# # Distribución de Préstamos por Día
-# loan_counts = df['Loan Date'].value_counts()
-# mean_loans_per_day = loan_counts.mean()
 
-# # Generar distribución de Poisson
-# poisson_dist = np.random.poisson(mean_loans_per_day, 1000)
+# Crear una columna de año-mes para el análisis de series temporales
+df['YearMonth'] = df['Loan Date'].dt.to_period('M').astype(str)
 
-# # Visualizar la distribución de Poisson con streamlit
 
-# fig, ax = plt.subplots(figsize=(10, 6))
-# ax.hist(poisson_dist, bins=30, color='skyblue', edgecolor='black', alpha=0.7)
-# ax.set_xlabel('Número de Préstamos por Día')
-# ax.set_ylabel('Frecuencia')
-# ax.set_title('Distribución de Poisson de la Demanda de Libros por Día')
-# st.pyplot(fig)
+# Agrupar por año-mes y contar el número de préstamos
+monthly_loans = df.groupby('YearMonth').size().reset_index(name='Loan Count')
+
+# Visualizar la cantidad de préstamos por mes utilizando Plotly
+fig = px.line(monthly_loans, x='YearMonth', y='Loan Count',
+              title='Cantidad de Préstamos por Mes')
+st.plotly_chart(fig)

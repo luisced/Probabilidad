@@ -3,12 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from connection import load_data
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
+import plotly.express as px
 
 st.title("Optimización de Inventario de Libros")
 
 # Descripción de la funcionalidad
 st.markdown("""
-## Descripción del Proyecto
+## Descripción 
 
 **Objetivo:** Optimizar el inventario de los libros más demandados en la biblioteca.
 
@@ -81,6 +82,12 @@ inventory_df = pd.DataFrame({
     'Safety Stock': safety_stocks
 })
 
+
+# Agrupar por biblioteca y clasificación, y contar el número de préstamos
+library_classification = df.groupby(
+    ['Library Name', 'Clasification']).size().reset_index(name='Loan Count')
+
+
 st.subheader("Optimización de Inventario para los 10 libros más demandados")
 fig, ax1 = plt.subplots(figsize=(14, 8))
 ax1.bar(inventory_df['Book Title'], inventory_df['Reorder Point'],
@@ -102,3 +109,7 @@ ax2.legend(loc='upper right')
 plt.title('Inventory Optimization for Top 10 Most Demanded Books')
 plt.grid(True)
 st.pyplot(fig)
+# Visualizar los tipos de libros más rentados por biblioteca
+fig = px.bar(library_classification, x='Library Name', y='Loan Count', color='Clasification',
+             title='Tipos de Libros más Rentados por Biblioteca')
+st.plotly_chart(fig)

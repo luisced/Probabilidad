@@ -1,36 +1,42 @@
 import pandas as pd
-import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 import plotly.express as px
 import streamlit as st
 from connection import load_data
 
-
 # Cargar y preprocesar los datos
 df = load_data('./database.db')
-exam_df = df[df['Is Exam Period'] == True]
 
-# Seleccionar características relevantes
-features = exam_df[['Title', 'Loan Time Seconds']]
-features = features.groupby('Title').mean().reset_index()
+# Convertir las columnas necesarias a tipo datetime y calcular el tiempo de préstamo en segundos
+df['Loan Date'] = pd.to_datetime(df['Loan Date'])
+df['Loan Time Seconds'] = pd.to_timedelta(df['Loan Time']).dt.total_seconds()
 
-# Normalizar las características
+# Filtrar por periodos de exámenes
+exam_period_df = df[df['Is Exam Period'] == 1]
+
+# Normalizar los datos antes del clustering
 scaler = StandardScaler()
-features[['Loan Time Seconds']] = scaler.fit_transform(
-    features[['Loan Time Seconds']])
+exam_period_df['Loan Time Seconds Normalized'] = scaler.fit_transform(
+    exam_period_df[['Loan Time Seconds']])
 
-# Aplicar K-means clustering
-kmeans = KMeans(n_clusters=4, random_state=42)
-features['Cluster'] = kmeans.fit_predict(features[['Loan Time Seconds']])
+# Preparar los datos para el clustering
+X = exam_period_df[['Loan Time Seconds Normalized']]
 
-# Visualizar los clusters
-fig = px.scatter(features, x='Title', y='Loan Time Seconds', color='Cluster',
+# Aplicar KMeans
+kmeans = KMeans(n_clusters=3, random_state=42)
+exam_period_df['Cluster'] = kmeans.fit_predict(X)
+
+# Mostrar los resultados en Streamlit
+st.title('Clustering de Categorías Prestadas por Mayor Tiempo en Período de Exámenes')
+
+# Visualización de los clusters utilizando plotly
+fig = px.scatter(exam_period_df, x='Clasification', y='Loan Time Seconds', color='Cluster',
                  title='Clusters de Libros Basados en Duración de Préstamo durante Períodos de Exámenes')
 fig.update_layout(xaxis={'categoryorder': 'total descending'})
 st.plotly_chart(fig)
 
 # Mostrar algunos datos de ejemplo de cada cluster
-for cluster_num in range(4):
+for cluster_num in exam_period_df['Cluster'].unique():
     st.write(f"Cluster {cluster_num}")
-    st.write(features[features['Cluster'] == cluster_num].head())
+    st.write(exam_period_df[exam_period_df['Cluster'] == cluster_num].head())
