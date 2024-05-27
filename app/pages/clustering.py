@@ -1,42 +1,73 @@
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
+from connection import load_data
 import plotly.express as px
 import streamlit as st
-from connection import load_data
 
-# Cargar y preprocesar los datos
+# Cargar los datos
 df = load_data('./database.db')
 
-# Convertir las columnas necesarias a tipo datetime y calcular el tiempo de préstamo en segundos
+# Convertir Loan Date a formato de fecha
 df['Loan Date'] = pd.to_datetime(df['Loan Date'])
-df['Loan Time Seconds'] = pd.to_timedelta(df['Loan Time']).dt.total_seconds()
 
-# Filtrar por periodos de exámenes
-exam_period_df = df[df['Is Exam Period'] == 1]
+# Rellenar los valores faltantes si es necesario
+df = df.dropna(subset=['Loan Time Seconds',
+               'Clasification', 'Is Exam Period', 'Library Name'])
 
-# Normalizar los datos antes del clustering
+# Seleccionar las columnas necesarias para clustering
+df_clustering = df[['Loan Time Seconds', 'Is Exam Period', 'Library Name']]
+
+# Convertir las variables categóricas a variables dummy
+df_clustering = pd.get_dummies(df_clustering, columns=[
+                               'Is Exam Period', 'Library Name'], drop_first=True)
+# Cargar los datos
+df = load_data('./database.db')
+
+# Convertir Loan Date a formato de fecha
+df['Loan Date'] = pd.to_datetime(df['Loan Date'])
+
+# Rellenar los valores faltantes si es necesario
+df = df.dropna(subset=['Loan Time Seconds',
+               'Clasification', 'Is Exam Period', 'Library Name'])
+
+# Seleccionar las columnas necesarias para clustering
+df_clustering = df[['Loan Time Seconds',
+                    'Is Exam Period', 'Library Name', 'Clasification']]
+
+# Convertir las variables categóricas a variables dummy
+df_clustering = pd.get_dummies(df_clustering, columns=[
+                               'Is Exam Period', 'Library Name', 'Clasification'], drop_first=True)
+
+# Escalar los datos
 scaler = StandardScaler()
-exam_period_df['Loan Time Seconds Normalized'] = scaler.fit_transform(
-    exam_period_df[['Loan Time Seconds']])
+df_scaled = scaler.fit_transform(df_clustering)
 
-# Preparar los datos para el clustering
-X = exam_period_df[['Loan Time Seconds Normalized']]
-
-# Aplicar KMeans
+# Definir el número de clusters
 kmeans = KMeans(n_clusters=3, random_state=42)
-exam_period_df['Cluster'] = kmeans.fit_predict(X)
 
-# Mostrar los resultados en Streamlit
-st.title('Clustering de Categorías Prestadas por Mayor Tiempo en Período de Exámenes')
+# Ajustar el modelo
+kmeans.fit(df_scaled)
 
-# Visualización de los clusters utilizando plotly
-fig = px.scatter(exam_period_df, x='Clasification', y='Loan Time Seconds', color='Cluster',
-                 title='Clusters de Libros Basados en Duración de Préstamo durante Períodos de Exámenes')
-fig.update_layout(xaxis={'categoryorder': 'total descending'})
+# Añadir las etiquetas de los clusters al DataFrame original
+df['Cluster'] = kmeans.labels_
+
+# Visualizar los clusters
+fig = px.scatter(df, x='Loan Time Seconds', y='Cluster', color='Cluster',
+                 title='Clustering de Duración de Préstamo')
 st.plotly_chart(fig)
 
-# Mostrar algunos datos de ejemplo de cada cluster
-for cluster_num in exam_period_df['Cluster'].unique():
-    st.write(f"Cluster {cluster_num}")
-    st.write(exam_period_df[exam_period_df['Cluster'] == cluster_num].head())
+# Visualización de los clusters por biblioteca y duración de préstamo
+fig = px.scatter(df, x='Library Name', y='Loan Time Seconds', color='Cluster',
+                 title='Clustering por Biblioteca y Duración de Préstamo')
+st.plotly_chart(fig)
+
+# Visualización de los clusters por periodo de examen y duración de préstamo
+fig = px.scatter(df, x='Is Exam Period', y='Loan Time Seconds', color='Cluster',
+                 title='Clustering por Periodo de Examen y Duración de Préstamo')
+st.plotly_chart(fig)
+
+# Visualización de los clusters por clasificación y duración de préstamo
+fig = px.scatter(df, x='Clasification', y='Loan Time Seconds', color='Cluster',
+                 title='Clustering por Clasificación y Duración de Préstamo')
+st.plotly_chart(fig)

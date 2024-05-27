@@ -27,12 +27,12 @@ for materia in materias:
     df_materia = df[df['Clasification'] == materia]
 
     # Seleccionar las columnas necesarias para la regresión
-    df_regression = df_materia[['Loan Time Seconds',
-                                'Is Exam Period', 'Library Name', 'YearMonth']]
+    df_regression = df_materia[[
+        'Loan Time Seconds', 'YearMonth', 'Library Name']]
 
     # Convertir las variables categóricas a variables dummy
     df_regression = pd.get_dummies(df_regression, columns=[
-                                   'Is Exam Period', 'Library Name', 'YearMonth'], drop_first=True)
+                                   'YearMonth', 'Library Name'], drop_first=True)
 
     # Separar las características (X) y la variable objetivo (y)
     X = df_regression.drop('Loan Time Seconds', axis=1)
