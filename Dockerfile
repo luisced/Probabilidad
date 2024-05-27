@@ -16,5 +16,8 @@ COPY . .
 # Expose the port Streamlit is running on
 EXPOSE 8501
 
+# Move to the app directory
+WORKDIR /app/app
+
 # Run the Streamlit app
 CMD ["streamlit", "run", "main.py"]
