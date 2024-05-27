@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Define the image name
+# Define the image name and container name
 IMAGE_NAME="my-streamlit-app"
+CONTAINER_NAME="my-streamlit-container"
 
 # Build the Docker image
 echo "Building the Docker image..."
@@ -15,9 +16,9 @@ else
     exit 1
 fi
 
-# Run the Docker container
+# Run the Docker container with a specified name
 echo "Running the Docker container..."
-docker run -p 8501:8501 $IMAGE_NAME
+docker run --name $CONTAINER_NAME -p 8501:8501 $IMAGE_NAME
 
 # Check if the container started successfully
 if [ $? -eq 0 ]; then
