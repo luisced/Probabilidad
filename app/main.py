@@ -23,8 +23,7 @@ def main():
                  )
     st.page_link("pages/distribution.py",
                  label="Distribution", icon="📦")
-    st.page_link("pages/prueba_hipotesis.py",
-                 label="Prueba de Hipótesis", icon="📊")
+
     st.page_link("pages/san_agustin.py",
                  label="San Agustín", icon="📚")
 
