@@ -62,3 +62,27 @@ non_exam_time_ci = stats.t.interval(confidence_level, len(
 st.write(f"Intervalo de Confianza para la Media del Tiempo de Préstamo fuera de Periodos de Exámenes: {
          non_exam_time_ci}")
 # Cerrar la conexión
+
+st.markdown("""
+## Explicación del Análisis
+
+### Prueba de Hipótesis
+La prueba de hipótesis se utiliza para determinar si hay una diferencia significativa en la demanda de libros durante los periodos de exámenes en comparación con los periodos fuera de exámenes. Utilizamos una prueba t para comparar los tiempos de préstamo promedio en segundos entre los dos periodos.
+
+- **Estadístico t**: Mide la diferencia entre las medias de los dos grupos en unidades de desviación estándar.
+- **p-valor**: Indica la probabilidad de observar una diferencia tan grande como la observada, bajo la hipótesis nula de que no hay diferencia.
+
+Si el p-valor es menor que 0.05, rechazamos la hipótesis nula, indicando que hay una diferencia significativa.
+
+### Distribución de los Tiempos de Préstamo
+El box plot muestra la distribución de los tiempos de préstamo en segundos para los periodos de exámenes y no exámenes. Esta visualización ayuda a comparar la dispersión y las características de los tiempos de préstamo en los dos periodos.
+
+- **Eje X (Periodo)**: Representa los periodos de exámenes y no exámenes.
+- **Eje Y (Tiempo de Préstamo en Segundos)**: Representa los tiempos de préstamo en segundos.
+
+### Intervalos de Confianza
+Los intervalos de confianza proporcionan un rango estimado en el que probablemente se encuentra la media del tiempo de préstamo para cada periodo.
+
+- **Intervalo de Confianza para la Media del Tiempo de Préstamo en Periodos de Exámenes**: Proporciona un rango en el que se espera que se encuentre la media del tiempo de préstamo durante los periodos de exámenes, con un 95% de confianza.
+- **Intervalo de Confianza para la Media del Tiempo de Préstamo fuera de Periodos de Exámenes**: Proporciona un rango en el que se espera que se encuentre la media del tiempo de préstamo fuera de los periodos de exámenes, con un 95% de confianza.
+""")

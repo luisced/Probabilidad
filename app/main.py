@@ -6,9 +6,6 @@ import seaborn as sns
 from connection import load_data
 
 
-
-
-
 def main():
 
     # Set Streamlit page title and sidebar
@@ -20,6 +17,16 @@ def main():
                  label="Library Location", icon="🏫")
     st.page_link("pages/inventory.py",
                  label="Inventory Optimization", icon="📚")
+
+    st.page_link("pages/clustering.py",
+                 label="Clustering", icon="🔢"
+                 )
+    st.page_link("pages/distribution.py",
+                 label="Distribution", icon="📦")
+    st.page_link("pages/prueba_hipotesis.py",
+                 label="Prueba de Hipótesis", icon="📊")
+    st.page_link("pages/san_agustin.py",
+                 label="San Agustín", icon="📚")
 
     # Load data
     df = load_data('./database.db')
@@ -42,7 +49,6 @@ def main():
     - **Loan Date:** Fecha en que se realizó el préstamo.
     - **Loan Time:** Hora en que se realizó el préstamo.
     """)
-
 
 
 if __name__ == "__main__":

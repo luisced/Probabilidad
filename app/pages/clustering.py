@@ -66,7 +66,7 @@ centroids_df['Library_Name'] = centroids_df['Library_Name_Encoded'].apply(
 
 # Visualización de los clusters por título y fecha
 fig = px.scatter(df_cleaned, y='Loan Date', x=[f'Título {i}' for i in range(len(df_cleaned))], color='Cluster',
-                 title='Clustering de Préstamos durante el Periodo de Examen',
+                 title='Clustering de Préstamos a lo largo del Tiempo (2023)',
                  hover_data=['Title', 'Call Number', 'Library Name', 'Loan Time'])
 
 # Ajustar el rango de fechas en el eje Y para incluir todo el año 2023
