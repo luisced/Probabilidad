@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from connection import load_data
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import plotly.express as px
+import plotly.graph_objects as go
 
 st.title("Optimización de Inventario de Libros")
 
@@ -111,14 +112,115 @@ plt.grid(True)
 st.pyplot(fig)
 
 # Visualización de tipos de libros más rentados por biblioteca
-fig = px.bar(library_classification, x='Library Name', y='Loan Count', color='Clasification',
-             title='Tipos de Libros más Rentados por Biblioteca')
+fig = px.bar(library_classification, x='Library Name', y='Loan Count',
+             color='Clasification', title='Tipos de Libros más Rentados por Biblioteca')
 fig.update_layout(
     xaxis_title="Nombre de la Biblioteca",
     yaxis_title="Cantidad de Préstamos",
     title="Tipos de Libros más Rentados por Biblioteca"
 )
 st.plotly_chart(fig)
+
+# Visualización de libros rentados en época ordinaria vs. exámenes
+loan_counts_exam_vs_ordinary = df.groupby(
+    'Is Exam Period').size().reset_index(name='Loan Count')
+loan_counts_exam_vs_ordinary['Within Exam Week'] = loan_counts_exam_vs_ordinary['Is Exam Period'].apply(
+    lambda x: 'Con exámenes' if x == 1 else 'Sin exámenes')
+
+color_normal = 'blue'
+color_examenes = 'red'
+
+fig2 = go.Figure()
+
+# Adding bars for both periods
+fig2.add_trace(go.Bar(
+    x=loan_counts_exam_vs_ordinary['Within Exam Week'],
+    y=loan_counts_exam_vs_ordinary['Loan Count'],
+    marker_color=[color_normal if period ==
+                  'Sin exámenes' else color_examenes for period in loan_counts_exam_vs_ordinary['Within Exam Week']],
+    text=loan_counts_exam_vs_ordinary['Loan Count'],
+    textposition='outside'
+))
+
+fig2.update_layout(
+    title='Libros rentados en época ordinaria vs. exámenes',
+    xaxis_title='Periodo',
+    yaxis_title='Total de préstamos',
+    showlegend=False
+)
+
+st.plotly_chart(fig2)
+
+# Group by library and exam period, and count the number of loans
+loan_counts_by_library_and_period = df.groupby(
+    ['Library Name', 'Is Exam Period']).size().reset_index(name='Loan Count')
+loan_counts_by_library_and_period['Within Exam Week'] = loan_counts_by_library_and_period['Is Exam Period'].apply(
+    lambda x: 'Con exámenes' if x == 1 else 'Sin exámenes')
+
+fig3 = go.Figure()
+
+# Adding bars for each library and period
+for period, color in zip(['Sin exámenes', 'Con exámenes'], [color_normal, color_examenes]):
+    period_data = loan_counts_by_library_and_period[
+        loan_counts_by_library_and_period['Within Exam Week'] == period]
+    fig3.add_trace(go.Bar(
+        x=period_data['Library Name'],
+        y=period_data['Loan Count'],
+        name=period,
+        marker_color=color,
+        text=period_data['Loan Count'],
+        textposition='inside'
+    ))
+
+# Update layout for better readability
+fig3.update_layout(
+    title='Libros rentados en época ordinaria vs. exámenes por biblioteca',
+    xaxis_title='Biblioteca',
+    yaxis_title='Total de préstamos',
+    barmode='group',
+    xaxis_tickangle=-45,  # Rotate x-axis labels for better readability
+    legend_title='Period',
+    uniformtext_minsize=8,
+    uniformtext_mode='hide'
+)
+
+# Adding annotations in the center of the bars
+for data in fig3.data:
+    data.insidetextanchor = 'middle'
+    data.textfont = dict(color='white')
+
+st.plotly_chart(fig3)
+
+# Group by classification and count the number of loans
+loan_counts_by_topic = df.groupby(
+    'Clasification').size().reset_index(name='Loan Count')
+
+# Create bar chart with different colors for each bar using Plotly
+fig4 = go.Figure()
+
+fig4.add_trace(go.Bar(
+    x=loan_counts_by_topic['Clasification'],
+    y=loan_counts_by_topic['Loan Count'],
+    text=loan_counts_by_topic['Loan Count'],
+    textposition='outside'
+))
+
+# Update layout for better readability
+fig4.update_layout(
+    title='Préstamos por Clasificación',
+    xaxis_title='Clasificación',
+    yaxis_title='Préstamos por Clasificación',
+    xaxis_tickangle=-45,  # Rotate x-axis labels for better readability
+    uniformtext_minsize=8,
+    uniformtext_mode='hide'
+)
+
+# Adding annotations on top of the bars
+for data in fig4.data:
+    data.insidetextanchor = 'end'
+    data.textfont = dict(color='black')
+
+st.plotly_chart(fig4)
 
 # Explicación del Análisis
 st.markdown("""
@@ -136,4 +238,10 @@ Esta visualización muestra la cantidad de préstamos de libros clasificados por
 
 - **Eje X (Nombre de la Biblioteca)**: Representa las distintas bibliotecas.
 - **Eje Y (Cantidad de Préstamos)**: Representa el número total de préstamos de libros en cada biblioteca.
+
+### Libros rentados en época ordinaria vs. exámenes
+Este gráfico compara la cantidad de libros rentados en periodos ordinarios y en periodos de exámenes. Permite analizar cómo varía la demanda de libros durante los exámenes y ajustar la gestión del inventario en consecuencia.
+
+- **Periodo**: Diferencia entre periodos ordinarios y periodos de exámenes.
+- **Total de préstamos**: Cantidad total de préstamos de libros en cada periodo.
 """)

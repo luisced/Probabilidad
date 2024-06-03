@@ -13,9 +13,8 @@ def main():
     # st.sidebar.header("Settings")
 
     # Page navigation
-    st.page_link("pages/library_location.py",
-                 label="Library Location", icon="🏫")
-    st.page_link("pages/inventory.py",
+
+    st.page_link("pages/inventory_optimization.py",
                  label="Inventory Optimization", icon="📚")
 
     st.page_link("pages/clustering.py",

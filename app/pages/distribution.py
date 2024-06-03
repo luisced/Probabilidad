@@ -4,6 +4,8 @@ from connection import load_data
 import plotly.figure_factory as ff
 import plotly.express as px
 import pandas as pd
+from scipy.stats import poisson
+import matplotlib.pyplot as plt
 
 # Cargar los datos desde la base de datos
 df = load_data('./database.db')
@@ -60,6 +62,39 @@ fig.update_layout(
     title="Cantidad de Préstamos por Mes"
 )
 st.plotly_chart(fig)
+
+# Assuming you have calculated λ (lambda)
+λ = 58  # Example value, replace this with your actual λ
+
+# Generate the Poisson distribution data
+x = np.arange(30, 110)  # Adjust the range as needed
+y = poisson.pmf(x, λ)
+
+# Define the value after which bars should be a different color
+threshold = 63
+
+color_disponible = (6/255, 78/255, 188/255)
+color_no_disponible = (183/255, 0, 0)
+
+# Plotting
+plt.figure(figsize=(10, 5))
+
+# Plot bars before the threshold
+plt.bar(x[x < threshold], y[x < threshold],
+        color=color_disponible, label=f'P(x < {threshold})')
+
+# Plot bars after the threshold
+plt.bar(x[x >= threshold], y[x >= threshold],
+        color=color_no_disponible, label=f'P(x >= {threshold})')
+
+# Add labels and title
+
+plt.xlabel('Número de Préstamos')
+plt.ylabel('Probabilidad')
+plt.title('Distribución de Poisson para la Demanda de Libros')
+plt.legend()
+st.pyplot()
+
 
 # Explicación del Análisis
 st.markdown("""
