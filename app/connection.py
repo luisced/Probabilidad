@@ -69,7 +69,7 @@ def preprocess_data(df):
 
 # Cargar el archivo Excel
 excel_file = './data.xlsx'
-df = pd.read_excel(excel_file, skiprows=2)
+df = pd.read_excel(excel_file)
 
 # Conectar a la base de datos SQLite (o crearla)
 conn = sqlite3.connect('database.db')

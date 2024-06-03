@@ -10,7 +10,7 @@ df = load_data('./database.db')
 df['Week'] = df['Loan Date'].dt.isocalendar().week
 
 # Pivot table to create a heatmap-friendly format
-pivot_table = df.pivot_table(values='Barcode', index='Week',
+pivot_table = df.pivot_table(values='Title', index='Week',
                              columns='Library Name', aggfunc='count', fill_value=0)
 
 # Function to generate and display the heatmap
